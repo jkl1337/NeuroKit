@@ -450,21 +450,19 @@ def _ecg_simulate_rrprocess(
     rrmean = 60 / hrmean
     rrstd = 60 * hrstd / (hrmean * hrmean)
 
-    df = sfrr / n
-    w = np.arange(n) * 2 * np.pi * df
+    w = np.linspace(0, sfrr * np.pi, int(n / 2 + 1))
     dw1 = w - w1
     dw2 = w - w2
 
     Hw1 = sig1 * np.exp(-0.5 * (dw1 / c1) ** 2) / np.sqrt(2 * np.pi * c1 ** 2)
     Hw2 = sig2 * np.exp(-0.5 * (dw2 / c2) ** 2) / np.sqrt(2 * np.pi * c2 ** 2)
     Hw = Hw1 + Hw2
-    Hw0 = np.concatenate((Hw[0 : int(n / 2)], Hw[int(n / 2) - 1 :: -1]))
-    Sw = (sfrr / 2) * np.sqrt(Hw0)
+    Sw = (sfrr / 2) * np.sqrt(Hw)
 
     ph0 = 2 * np.pi * rng.uniform(size=int(n / 2 - 1))
-    ph = np.concatenate([[0], ph0, [0], -np.flipud(ph0)])
+    ph = np.concatenate(([0], ph0, [0]))
     SwC = Sw * np.exp(1j * ph)
-    x = (1 / n) * np.real(np.fft.ifft(SwC))
+    x = (1 / n) * np.fft.irfft(SwC)
 
     xstd = np.std(x)
     ratio = rrstd / xstd
