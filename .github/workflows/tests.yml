@@ -2,11 +2,7 @@ name: 🏭Tests
 
 # on: [push, pull_request]
 on:
-    # Trigger the workflow on push to master branch or pull request
     push:
-        branches:
-            - master
-    pull_request:
 
 jobs:
     build:
