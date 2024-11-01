@@ -381,7 +381,7 @@ def _ecg_simulate_ecgsyn(
         # as passing extra arguments to derivative function is not supported yet in solve_ivp
         # lambda function is used to serve the purpose
         result = scipy.integrate.solve_ivp(
-            lambda t, x: _ecg_simulate_derivsecgsyn(t, x, rrn, ti, sfint, gamma[lead] * ai, bi),
+            lambda t, x: _ecg_simulate_derivsecgsyn(t, x, rrn, ti, sfint, gamma[lead] * ai, bi, fhi),
             Tspan,
             x0,
             t_eval=t_eval,
@@ -404,7 +404,7 @@ def _ecg_simulate_ecgsyn(
     return signals, results
 
 
-def _ecg_simulate_derivsecgsyn(t, x, rr, ti, sfint, ai, bi):
+def _ecg_simulate_derivsecgsyn(t, x, rr, ti, sfint, ai, bi, fhi):
 
     ta = math.atan2(x[1], x[0])
     r0 = 1
@@ -412,10 +412,8 @@ def _ecg_simulate_derivsecgsyn(t, x, rr, ti, sfint, ai, bi):
 
     ip = np.floor(t * sfint).astype(int)
     w0 = 2 * np.pi / rr[min(ip, len(rr) - 1)]
-    # w0 = 2*np.pi/rr[ip[ip <= np.max(rr)]]
 
-    fresp = 0.25
-    zbase = 0.005 * np.sin(2 * np.pi * fresp * t)
+    zbase = 0.005 * np.sin(2 * np.pi * fhi * t)
 
     dx1dt = a0 * x[0] - w0 * x[1]
     dx2dt = a0 * x[1] + w0 * x[0]
